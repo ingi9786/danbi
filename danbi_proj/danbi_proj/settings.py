@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -103,6 +104,14 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
+]
+
+
+# custom auth test
+# ROUTINE_AUTH = os.path.join(BASE_DIR, "")
+AUTHENTICATION_BACKENDS = [
+    'routine_app.routine_auth.UserBackend',
+    'django.contrib.auth.backends.ModelBackend', # Django가 관리하는 AUTH
 ]
 
 
