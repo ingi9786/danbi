@@ -41,10 +41,17 @@ INSTALLED_APPS = [
     
     # rest_framework
     'rest_framework',
+    # 'rest_framework.authtoken',
     
     # app config
     'routine_app.apps.RoutineAppConfig'
 ]
+
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         'rest_framework.authentication.TokenAuthentication',
+#     ]
+# }
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
