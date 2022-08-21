@@ -1,5 +1,5 @@
 
-from .views import register_view, login_view, registerView
+from .views import register_view, login_view
 from django.urls import path
 
 # from rest_framework import routers
@@ -7,10 +7,6 @@ from django.urls import path
 
 # router = routers.DefaultRouter()
 # router.register(r'urls', UrlListView)
-
-from rest_framework import routers
-router = routers.DefaultRouter()
-router.register(r'', registerView)
 
 urlpatterns = [
     path("register", register_view, name="register_view"),

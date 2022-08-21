@@ -28,7 +28,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -113,11 +112,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL='routine_app.Myuser'
 
 # custom auth test
 # ROUTINE_AUTH = os.path.join(BASE_DIR, "")
 AUTHENTICATION_BACKENDS = [
-    'routine_app.routine_auth.UserBackend',
+    # 'routine_app.routine_auth.UserBackend',
     'django.contrib.auth.backends.ModelBackend', # Django가 관리하는 AUTH
 ]
 

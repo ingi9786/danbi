@@ -1,4 +1,5 @@
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
+from .models import Myuser
 from rest_framework import serializers
 
 
@@ -44,7 +45,7 @@ class UserRegisterSerializer(serializers.Serializer):
 
 class UserLoginSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = Myuser
         fields = ["email", "password"]
 
     
