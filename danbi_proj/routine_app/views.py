@@ -24,9 +24,10 @@ def login_view(request):
         serializer = UserLoginSerializer()
         email = request.GET.get("email")
         password = request.GET.get("password")
-        user = authenticate(email=email, password=password)
-        # login(request, user, backend='routine_app.routine_auth.UserBackend')
-        login(request, user)
+        # user = authenticate(email=email, password=password)
+        # # login(request, user, backend='routine_app.routine_auth.UserBackend')
+        # login(request, user)
+        Myuser.create_user(email, password)
         data = {'로그인': '성공'}
     return JsonResponse(data)
 
