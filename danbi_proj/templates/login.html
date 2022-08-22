@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Routine Login Page</title>
+  </head>
+  <body>
+    <h2>로그인 페이지</h2>
+    <h4>{%if msg%}{{msg}}{%endif%}</h4>
+    <form method="post">
+      {% csrf_token %} {{ form.as_p }}
+      <button type="submit">가입하기</button>
+    </form>
+    <a href="{% url 'main_view' %}">메인페이지로</a>
+  </body>
+</html>
