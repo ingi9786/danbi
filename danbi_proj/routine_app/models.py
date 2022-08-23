@@ -106,7 +106,20 @@ class Routine(TimeStampedModel):
     class Meta:
         db_table = "routine"
 
+class RoutineDay(TimeStampedModel):
+    class Day(models.TextChoices):
+        MON = "mon", _("월");  TUE = "tue", _("화")
+        WED = "wed", _("수");  THU = "thu", _("목")
+        FRI = "fri", _("금");  SAT = "sat", _("토");  SUN = "sun", _("일")
+    
+    day        = models.CharField(max_length=3, choices=Day.choices)
+    routine    = models.ForeignKey(Routine, on_delete=models.CASCADE)
+    
+    class Meta:
+        db_table = "routine_day"
 
+
+# day를 참조하는 forienkey가 있어야 '월' 삭제하면 result도 없애지 않나? 데이 수정시 day테이블 삭제 > result테이블 (is_deletd True)
 class RoutineResult(TimeStampedModel):
     class Result(models.TextChoices):
         NOT  = "not", _("안함")
@@ -114,22 +127,10 @@ class RoutineResult(TimeStampedModel):
         DONE = "done", _("완료")
 
     routine_result_id = models.BigAutoField(primary_key=True)
-    routine           = models.ForeignKey(Routine, on_delete=models.DO_NOTHING)
+    routine           = models.ForeignKey(Routine, on_delete=models.CASCADE)
+    # day               = models.ForeignKey(RoutineDay, on_delete=models.DO_NOTHING)
     result            = models.CharField(max_length=4, choices=Result.choices, default=Result.NOT)
     is_deleted        = models.BooleanField(default=False)
     
     class Meta:
         db_table = "routine_result"
-
-
-class RoutineDay(TimeStampedModel):
-    class Day(models.TextChoices):
-        MON = "mon", _("월");  TUE = "tue", _("화")
-        WED = "wed", _("수");  THU = "thu", _("목")
-        FRI = "fri", _("금");  SAT = "sat", _("토");  SUN = "sun", _("일")
-
-    day        = models.CharField(max_length=3, choices=Day.choices)
-    routine    = models.ForeignKey(Routine, on_delete=models.DO_NOTHING)
-    
-    class Meta:
-        db_table = "routine_day"
