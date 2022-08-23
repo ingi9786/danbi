@@ -38,6 +38,7 @@ class Myuser(AbstractBaseUser):
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS= ["user_name", "first_name"]
@@ -46,6 +47,26 @@ class Myuser(AbstractBaseUser):
     
     def __str__(self):
         return self.user_name
+    
+    # 왠지 몰라도 admin 쓰려면 필요함
+    def get_full_name(self):
+        pass
+    def get_short_name(self):
+        pass
+    @property
+    def is_superuser(self):
+        return self.is_admin
+    @property
+    def is_staff(self):
+        return self.is_admin
+    def has_perm(self, perm, obj=None):
+        return self.is_admin
+    def has_module_perms(self, app_label):
+        return self.is_admin
+    @is_staff.setter    
+    def is_staff(self, value):
+        self._is_staff = value
+
 
     class Meta:
         db_table = "my_user"
@@ -74,6 +95,14 @@ class Routine(TimeStampedModel):
     is_alarm   = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     
+    @property
+    def days(self):
+        return self.routineday_set.all()
+
+    @property
+    def result(self):
+        return self.routineresult_set.all()
+
     class Meta:
         db_table = "routine"
 
@@ -85,7 +114,7 @@ class RoutineResult(TimeStampedModel):
         DONE = "done", _("완료")
 
     routine_result_id = models.BigAutoField(primary_key=True)
-    routine           = models.OneToOneField(Routine, on_delete=models.CASCADE)
+    routine           = models.ForeignKey(Routine, on_delete=models.DO_NOTHING)
     result            = models.CharField(max_length=4, choices=Result.choices, default=Result.NOT)
     is_deleted        = models.BooleanField(default=False)
     
@@ -100,7 +129,7 @@ class RoutineDay(TimeStampedModel):
         FRI = "fri", _("금");  SAT = "sat", _("토");  SUN = "sun", _("일")
 
     day        = models.CharField(max_length=3, choices=Day.choices)
-    routine    = models.ManyToManyField(Routine)
+    routine    = models.ForeignKey(Routine, on_delete=models.DO_NOTHING)
     
     class Meta:
         db_table = "routine_day"

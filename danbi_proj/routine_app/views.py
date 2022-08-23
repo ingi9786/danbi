@@ -37,6 +37,8 @@ def login_view(request):
             password = form.cleaned_data['password']
             user = authenticate(email=email, password=password)
             login(request, user)
+            user_id = request.user.id
+            print(user_id)
             message = {
                 "msg"    : "Login Success!",
                 "status" : "USER_LOGIN_OK"
