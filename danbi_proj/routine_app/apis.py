@@ -66,11 +66,12 @@ class RoutineViewSet(viewsets.GenericViewSet):
         serializer = RoutineSerializer(query)
         msg = { "msg"    : "Routine lookup was successful.",
                 "status" : "ROUTINE_DETAIL_OK_200" }
-        return Response(
-            {
-                "data"   : serializer.data,
-                "message": msg
-            })
+        # return Response(
+        #     {
+        #         "data"   : serializer.data,
+        #         "message": msg
+        #     })
+        return Response(serializer.data)
 
     @renderer_classes([JSONRenderer])
     def update(self, request, routine_id=None):
@@ -82,10 +83,11 @@ class RoutineViewSet(viewsets.GenericViewSet):
                 "msg"    : "The routine has been modified.",
                 "status" : "ROUTINE_UPDATE_OK_200"
             }
-            return Response({
-                    "data":serializer.data,
-                    "message": msg
-                    })
+            # return Response({
+            #         "data":serializer.data,
+            #         "message": msg
+            #         })
+            return Response(serializer.data)
 
     @renderer_classes([JSONRenderer])
     def destroy(self, request, routine_id=None):
@@ -104,12 +106,46 @@ class RoutineViewSet(viewsets.GenericViewSet):
         serializer = RoutineSerializer(queryset, many=True)
         return Response(serializer.data)
     
-    # 단순한 CRUD면 detail=False다.
-    # 유저의 월요일에서 
-    @action(detail=True, methods=["get"])
-    def daylist(self, request, routine_id=None):
-        queryset = self.get_queryset().all() # 유저id, routinid로 필터링된 routine
+    # detail action(id를 필요로 하는 개별 action)이면 True
+    # list action (id가 필요없는 리스트 action)이면 False
+    
+    # daylist에 mon이 들어가거나 
+    @action(detail=False, methods=["GET"])
+    def days(self, request):
+        queryset = self.get_queryset().all() # 유저로 특정된 routine들이 있음.
+        date = request.GET.get('date')
+        _date = "mon"    # 날짜 to 요일 변경 로직
+        day_list = []
         for query in queryset:
-            days = RoutineDay.objects.filter(routine=query, day="mon")
-            serializer = DaySerializer(days, many=True)
-            return Response(serializer.data)
+            r_id = query.routine_id
+            day_obj = RoutineDay.objects.filter(day=_date, id=r_id).first()
+            if not day_obj:
+                continue
+            day_list.append(day_obj)
+        serializer = DaySerializer(day_list, many=True)
+        return Response(serializer.data)
+
+ 
+
+    # local/routine/daylist/?date GET > 월요일 일정모두 내놔 
+    
+    # local/routine/daydetail/d_id/?date GET, UPDATE, DELETE/CREATE
+    # @action(detail=False, methods=["GET", "PUT"])
+    # def daydetail(self, request, day_id=None):
+    #     # 쿼리로 넘어온 날짜를 str()요일로 바꾸는 로직
+    #     day = "mon"
+    #     if request.method == "GET":
+    #         query = RoutineDay.objects.filter(day=day, id=day_id).first()
+    #         if not query:
+    #             msg= { "msg" : "Couldn't find that routine detail",
+    #                    "status" : "NOT_FOUND_404"}
+    #             return Response({"message":msg})
+
+    #         msg = { "msg" : "Routine detail lookup was successful.",
+    #                 "status" : "ROUTINE_DETAIL_OK_200"}
+    #         serializer = DaySerializer(query)
+    #         return Response(serializer.data)
+        
+    #     else:
+            
+            

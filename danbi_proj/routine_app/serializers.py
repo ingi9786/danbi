@@ -7,33 +7,6 @@ from django.contrib.auth import get_user_model
 # writeonly는 반대 필드를 입력에는쓰고 출력에 안쓰게 하는 속성 (응답에 안보임)
 # day = serializers.DateField(initial = datetime.date.today)
 
-# 유튜브 양놈 안경잡이
-# class RoutineCreateSerializer(serializers.Serializer):
-#     title = serializers.CharField(max_length=100, required=True)
-#     category = serializers.ChoiceField(choices=["MIRACLE", "HOMEWORK"], allow_blank=False)
-#     goal = serializers.CharField(max_length=300, blank=True) 
-#     is_alarm = serializers.BooleanField(default=False)
-#     days = serializers.MultipleChoiceField(required=True, write_only=True)
-#     # _days = serializers.SerializerMethodField('_get_days')
-    
-#     # def _get_days(self, routine_obj):
-#     #     day = RoutineDay.objects.filter(routine_id= routine_obj.id)
-
-
-# # 유튭 빠박이 7시간
-# class RoutineReviewSerializer(serializers.Serializer):
-#     days = serializers.SerializerMethodField()
-#     class meta:
-#         model = Routine
-#         fields = ["title", "category", "goal", "is_alarm", "days"]
-    
-#     def _get_days(self, obj):
-#         r_id = obj.id
-#         obj.u
-
-
-
-
 # required=False로 둬서 필요에 따라 입력 받도록 설정? 
 class ResultSerializer(serializers.ModelSerializer):
     # routine_result_id = serializers.IntegerField(required=False)
@@ -50,8 +23,8 @@ class DaySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RoutineDay 
-        fields = ["id", "day", "result"] # "routine"
-        # read_only_fields = ("routine", )
+        fields = ["id", "day", "routine", "result"]
+        read_only_fields = ("routine", )
         
 # 이걸로 현재 조회가 가능한데, POST를 통한 create를 하기 싫으면 days, result에 required=False로 두자.
 # 
@@ -64,7 +37,7 @@ class RoutineSerializer(serializers.ModelSerializer):
         model = Routine
         fields = [
             "routine_id", "title", "category",
-            "goal", "is_alarm", "days", "result"
+            "goal", "is_alarm", "days", "result", 
         ] # "account"
     
     # https://stackoverflow.com/questions/22988878/pass-extra-arguments-to-serializer-class-in-django-rest-framework
@@ -77,7 +50,7 @@ class RoutineSerializer(serializers.ModelSerializer):
     # POST를 이용한 create까지 지원하려면 커스텀 create가 필요
     def create(self, validated_data):
         # days, result는 routine모델의 필드가 아닌 prop이니까 validated data에서 뺴야한다.
-        result = validated_data.pop("result")
+        # result = validated_data.pop("result")
         days = validated_data.pop("days")
 
         db = get_user_model()
@@ -87,11 +60,10 @@ class RoutineSerializer(serializers.ModelSerializer):
     
         for day in days:
             RoutineDay.objects.create(**day, routine=routine) # day도 JSON(dict)로 입력했을테니까 + routine객체
-        for res in result:
-            RoutineResult.objects.create(**res, routine=routine)
+        # for res in result:
+        #     RoutineResult.objects.create(**res, routine=routine)
         return routine
     
-    # 동시에 PUT을 이용해서 update기능 지원하려면 customizing
     def update(self, instance, validated_data): # 1st 매개변수로 model instance를 받는다. 
         instance.routine_id = validated_data.get("routine_id", instance.routine_id)
         instance.title = validated_data.get("title", instance.title)
@@ -103,33 +75,29 @@ class RoutineSerializer(serializers.ModelSerializer):
         test_user = db.objects.get(id=10)
         instance.account = test_user
         instance.save()
-        print("instance save")
+
         days = validated_data.pop('days')
-        result = validated_data.pop('result')
+        # result = validated_data.pop('result')
         for day in days:
             if 'id' in day.keys():  #  id가 있고
                 if RoutineDay.objects.filter(id=day["id"]):
                     d = RoutineDay.objects.get(id=day["id"])
                     d.day = day.get("day", d.day)
                     d.routine = Routine.objects.filter(routine_id=instance.routine_id).first()
-                    print("22")
-                    print(type(d))
                     d.save()
-                    print("33")
                 else:
                     continue
                 
-        for res in result:
-            print(res.keys())
-            if 'routine_result_id' in res.keys():  #  id가 있고
-                if RoutineResult.objects.filter(routine_result_id=res["routine_result_id"]):
-                    r = RoutineResult.objects.get(routine_result_id=res["routine_result_id"])
-                    r.result = res.get("result", r.result)
-                    r.routine = Routine.objects.filter(routine_id=instance.routine_id).first()
-                    r.save()
-                else:
-                    continue
-        print('done')
+        # for res in result:
+        #     print(res.keys())
+        #     if 'routine_result_id' in res.keys():  #  id가 있고
+        #         if RoutineResult.objects.filter(routine_result_id=res["routine_result_id"]):
+        #             r = RoutineResult.objects.get(routine_result_id=res["routine_result_id"])
+        #             r.result = res.get("result", r.result)
+        #             r.routine = Routine.objects.filter(routine_id=instance.routine_id).first()
+        #             r.save()
+        #         else:
+        #             continue
         return instance
 
             

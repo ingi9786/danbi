@@ -97,7 +97,7 @@ class Routine(TimeStampedModel):
     
     @property
     def days(self):
-        return self.routineday_set.all()
+        return self.day.all()
 
     @property
     def result(self):
@@ -131,7 +131,7 @@ class RoutineDay(TimeStampedModel):
         FRI = "fri", _("금");  SAT = "sat", _("토");  SUN = "sun", _("일")
     
     day        = models.CharField(max_length=3, choices=Day.choices)
-    routine    = models.ForeignKey(Routine, on_delete=models.CASCADE)
+    routine    = models.ForeignKey(Routine, on_delete=models.CASCADE, related_name="day")
     result     = models.ForeignKey(RoutineResult, on_delete=models.CASCADE)
     
     class Meta:
