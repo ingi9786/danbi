@@ -31,6 +31,7 @@ def register_view(request):
 # 로그인도 post로 하니까
 def login_view(request):
     if request.method == "POST":
+        # print(request.user.id)
         form = LoginForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data["email"]
