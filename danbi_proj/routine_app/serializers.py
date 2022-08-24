@@ -30,15 +30,15 @@ class DaySerializer(serializers.ModelSerializer):
 # 
 class RoutineSerializer(serializers.ModelSerializer):
     days = DaySerializer(many=True) # readonly 해서 serializer까지 days가 못들어왔음 request.data까진 왔는데
-    result = ResultSerializer(many=True) # day에서 result를 참조하게 함으로써 필요가 없어짐. 
+    # result = ResultSerializer(many=True) # day에서 result를 참조하게 함으로써 필요가 없어짐. 
     # account = serializers.SerializerMethodField(name="_get_userid")
 
     class Meta:
         model = Routine
         fields = [
             "routine_id", "title", "category",
-            "goal", "is_alarm", "days", "result", 
-        ] # "account"
+            "goal", "is_alarm", "days", 
+        ] # "result", "account"
     
     # https://stackoverflow.com/questions/22988878/pass-extra-arguments-to-serializer-class-in-django-rest-framework
     # def _get_userid(self, obj):

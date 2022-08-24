@@ -99,9 +99,9 @@ class Routine(TimeStampedModel):
     def days(self):
         return self.day.all()
 
-    @property
-    def result(self):
-        return self.routineresult_set.all()
+    # @property
+    # def result(self):
+    #     return self.routineresult_set.all()
 
     class Meta:
         db_table = "routine"
@@ -116,7 +116,6 @@ class RoutineResult(TimeStampedModel):
 
     routine_result_id = models.BigAutoField(primary_key=True)
     routine           = models.ForeignKey(Routine, on_delete=models.CASCADE)
-    # day               = models.ForeignKey(RoutineDay, on_delete=models.DO_NOTHING)
     result            = models.CharField(max_length=4, choices=Result.choices, default=Result.NOT)
     is_deleted        = models.BooleanField(default=False)
     
