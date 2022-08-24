@@ -30,6 +30,7 @@ from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import renderer_classes, action
 from rest_framework.renderers import JSONRenderer
+from .utils import date_day, get_today
 
 
 class RoutineViewSet(viewsets.GenericViewSet):
@@ -106,15 +107,11 @@ class RoutineViewSet(viewsets.GenericViewSet):
         serializer = RoutineSerializer(queryset, many=True)
         return Response(serializer.data)
     
-    # detail action(id를 필요로 하는 개별 action)이면 True
-    # list action (id가 필요없는 리스트 action)이면 False
-    
-    # daylist에 mon이 들어가거나 
     @action(detail=False, methods=["GET"])
     def days(self, request):
         queryset = self.get_queryset().all() # 유저로 특정된 routine들이 있음.
-        date = request.GET.get('date')
-        _date = "mon"    # 날짜 to 요일 변경 로직
+        date = request.GET.get('date', get_today())
+        _date = date_day(date)
         day_list = []
         for query in queryset:
             r_id = query.routine_id
@@ -124,28 +121,3 @@ class RoutineViewSet(viewsets.GenericViewSet):
             day_list.append(day_obj)
         serializer = DaySerializer(day_list, many=True)
         return Response(serializer.data)
-
- 
-
-    # local/routine/daylist/?date GET > 월요일 일정모두 내놔 
-    
-    # local/routine/daydetail/d_id/?date GET, UPDATE, DELETE/CREATE
-    # @action(detail=False, methods=["GET", "PUT"])
-    # def daydetail(self, request, day_id=None):
-    #     # 쿼리로 넘어온 날짜를 str()요일로 바꾸는 로직
-    #     day = "mon"
-    #     if request.method == "GET":
-    #         query = RoutineDay.objects.filter(day=day, id=day_id).first()
-    #         if not query:
-    #             msg= { "msg" : "Couldn't find that routine detail",
-    #                    "status" : "NOT_FOUND_404"}
-    #             return Response({"message":msg})
-
-    #         msg = { "msg" : "Routine detail lookup was successful.",
-    #                 "status" : "ROUTINE_DETAIL_OK_200"}
-    #         serializer = DaySerializer(query)
-    #         return Response(serializer.data)
-        
-    #     else:
-            
-            
