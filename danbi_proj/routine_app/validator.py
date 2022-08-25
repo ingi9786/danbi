@@ -7,7 +7,6 @@ class NumericSpecialCharValidator:
     """
     숫자, 특수문자를 포함하도록 검사하는 validator
     """
-
     def validate(self, password, user=None):
         regex = re.compile(r'(.*[a-z?=A-Z])(?=.*[0-9])(?=.*[\W\S_]).*')
         if re.match(regex, password) is None:

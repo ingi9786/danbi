@@ -8,6 +8,8 @@
   </head>
   <body>
     <h1>Welcome to Routine main page!</h1>
+    {% if message %} {{message}} {% endif%}
     <p>from Danbi.WINK</p>
+    <a href="{% url 'register_view' %}">회원가입</a>
   </body>
 </html>

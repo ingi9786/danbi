@@ -20,7 +20,13 @@ def register_view(request):
                 "msg"    : "Registered Success!",
                 "status" : "USER_REGISTER_OK"
             }
-        return render(request, "main.html", {"message":message})
+            return render(request, "main.html", {"message":message})
+        else:
+            message = {"msg" : "register fail"}
+            return render(request, "register.html", {"message": message})
+        
+        
+        
     else:
         form = RegisterForm()
         return render(request, "register.html", {"form":form})
