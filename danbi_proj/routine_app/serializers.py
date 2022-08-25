@@ -41,12 +41,11 @@ class RoutineSerializer(serializers.ModelSerializer):
         account = validated_data.pop("account")
 
         db = get_user_model()
-        test_user = db.objects.get(id=10)
+        user_obj = db.objects.get(id=account)
 
-        routine = Routine.objects.create(**validated_data, account=test_user) 
+        routine = Routine.objects.create(**validated_data, account=user_obj) 
 
         for day in days:
-            # RoutineResult.objects.create(result='not', routine=routine)
             RoutineDay.objects.create(**day, routine=routine) # day도 JSON(dict)로 입력했을테니까 + routine객체
         for res in result:
             RoutineResult.objects.create(**res, routine=routine)
@@ -54,14 +53,15 @@ class RoutineSerializer(serializers.ModelSerializer):
     
     def update(self, instance, validated_data): # 1st 매개변수로 model instance를 받는다. 
         instance.routine_id = validated_data.get("routine_id", instance.routine_id)
-        instance.title = validated_data.get("title", instance.title)
-        instance.category = validated_data.get("category", instance.category)
-        instance.goal = validated_data.get("goal", instance.goal)
-        instance.is_alarm = validated_data.get("is_alarm", instance.is_alarm)
-        
+        instance.title      = validated_data.get("title", instance.title)
+        instance.category   = validated_data.get("category", instance.category)
+        instance.goal       = validated_data.get("goal", instance.goal)
+        instance.is_alarm   = validated_data.get("is_alarm", instance.is_alarm)
+
+        account = validated_data.get("account")
         db = get_user_model()
-        test_user = db.objects.get(id=10)
-        instance.account = test_user
+        user_obj = db.objects.get(id=account.id)
+        instance.account = user_obj
         instance.save()
 
         days = validated_data.pop('days')
@@ -77,7 +77,6 @@ class RoutineSerializer(serializers.ModelSerializer):
                     continue
                 
         for res in result:
-            print(res.keys())
             if 'routine_result_id' in res.keys():  #  id가 있고
                 if RoutineResult.objects.filter(routine_result_id=res["routine_result_id"]):
                     r = RoutineResult.objects.get(routine_result_id=res["routine_result_id"])

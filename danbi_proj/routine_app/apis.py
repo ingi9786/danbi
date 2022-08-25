@@ -46,7 +46,6 @@ class RoutineViewSet(viewsets.GenericViewSet):
     def create(self, request, routine_id=None):
         # data = json.dumps(request.data)
         serializer = RoutineSerializer(data=request.data)
-        print("++++++++++++++++++++++++++")
         serializer.is_valid(raise_exception=True)
         if serializer.is_valid():
             serializer.save()
