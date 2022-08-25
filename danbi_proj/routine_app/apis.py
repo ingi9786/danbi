@@ -1,92 +1,63 @@
-from .models import Routine, RoutineDay, RoutineResult
-from .serializers import RoutineSerializer, DaySerializer
-from rest_framework.response import Response
-from rest_framework import status
 from rest_framework import viewsets
-from rest_framework.decorators import renderer_classes, action
-from rest_framework.renderers import JSONRenderer
-from .utils import convert_day, get_today, is_valid_date
+from rest_framework.decorators import action
+from .models import Routine, RoutineDay
+from .serializers import RoutineSerializer, DaySerializer
+from .utils import *
 
 
 class RoutineViewSet(viewsets.GenericViewSet):
     serializer_class = RoutineSerializer
-    lookup_field = 'routine_id'
-    
-    # 유저와 get으로 들어온 유저id로 필터된 routine쿼리셋
+    lookup_field     = 'routine_id'
+
     def get_queryset(self):
         uid = self.request.user.id
         return Routine.objects.filter(account=uid)
 
     def create(self, request, routine_id=None):
-        # data = json.dumps(request.data)
         serializer = RoutineSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         if serializer.is_valid():
             serializer.save()
-            msg = { "msg"    : "You have successfully created the routine.",
-                    "status" : "ROUTINE_CREATE_OK_201" }
-            # return Response({"data":serializer.data,"message": msg})
-            return Response(serializer.data)
-    
-    
-    # @renderer_classes([JSONRenderer])
+            return Response_201(serializer.data, "_CREATE")
+
     def retrieve(self, request, routine_id=None):
         query = self.get_queryset().filter(pk=routine_id).first()
-
         if not query:
-            msg = { "msg"    : "routine could not be found.",
-                    "status" : "NOT_FOUND_404"}
-            return Response({"message": msg})
-
+            return Response_404()
         serializer = RoutineSerializer(query)
-        msg = { "msg"    : "Routine lookup was successful.",
-                "status" : "ROUTINE_DETAIL_OK_200" }
-        # return Response(
-        #     {
-        #         "data"   : serializer.data,
-        #         "message": msg
-        #     })
-        return Response(serializer.data)
+        return Response_200(serializer.data, "_LOOKUP")
 
-    @renderer_classes([JSONRenderer])
     def update(self, request, routine_id=None):
         instance = self.get_object()                # routine 객체
         serializer = RoutineSerializer(instance, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            msg = {
-                "msg"    : "The routine has been modified.",
-                "status" : "ROUTINE_UPDATE_OK_200"
-            }
-            return Response({
-                    "data":serializer.data,
-                    "message": msg
-                    })
-            # return Response(serializer.data)
-
-    # @renderer_classes([JSONRenderer])
+            return Response_200(serializer.data, "_UPDATE")
+        else:
+            return Response_400()
+                
     def destroy(self, request, routine_id=None):
-        msg = { "msg"    : "The routine has been deleted.",
-                "status" : "ROUTINE_DELETE_OK_200"}
         query = self.get_queryset().filter(pk=routine_id)
         if not query:
-            msg= { "msg" : "routine could not be found.",
-                  "status" : "NOT_FOUND_404"}
+            return Response_404()
         query.delete()
-        return Response({"message":msg})
-    
- 
+        return Response_200(action="_DELETE")
+
     def list(self, request):
         queryset = self.get_queryset().all()
+        if not queryset:
+            return Response_404()
         serializer = RoutineSerializer(queryset, many=True)
-        return Response(serializer.data)
-    
+        return Response_200(serializer.data, "_LOOKUP", "ROUTINES")
+
     @action(detail=False, methods=["GET"])
     def days(self, request):
-        queryset = self.get_queryset().all() # 유저로 특정된 routine들이 있음.
+        queryset = self.get_queryset().all()
+        if not queryset:
+           return Response_404('DAY')
         date = request.GET.get('date', 'None') 
-        _date = convert_day(date) if is_valid_date(date) else convert_day(get_today())
-        
+        _date = convert_day(date) if is_valid_date(date) else convert_day(get_today()) 
+
         day_list = []
         for query in queryset:
             r_id = query.routine_id
@@ -94,5 +65,6 @@ class RoutineViewSet(viewsets.GenericViewSet):
             if not day_obj:
                 continue
             day_list.append(day_obj)
+
         serializer = DaySerializer(day_list, many=True)
-        return Response(serializer.data)
+        return Response_200(serializer.data, "_LOOKUP", "DAYS")

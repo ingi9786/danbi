@@ -5,7 +5,7 @@ from django.utils.translation import gettext as _
       
 class NumericSpecialCharValidator:
     """
-    Validate that the password is not entirely numeric.
+    숫자, 특수문자를 포함하도록 검사하는 validator
     """
 
     def validate(self, password, user=None):

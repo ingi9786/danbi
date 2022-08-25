@@ -1,7 +1,5 @@
 from django.db import models
-# from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
-
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.conf import settings
 
@@ -48,7 +46,6 @@ class Myuser(AbstractBaseUser):
     def __str__(self):
         return self.user_name
     
-    # 왠지 몰라도 admin 쓰려면 필요함
     def get_full_name(self):
         pass
     def get_short_name(self):
@@ -72,8 +69,6 @@ class Myuser(AbstractBaseUser):
         db_table = "my_user"
     
 
-# Create your models here.
-# 이거 나중에 빼놓자. 
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
@@ -107,7 +102,6 @@ class Routine(TimeStampedModel):
         db_table = "routine"
 
 
-# day를 참조하는 forienkey가 있어야 '월' 삭제하면 result도 없애지 않나? 데이 수정시 day테이블 삭제 > result테이블 (is_deletd True)
 class RoutineResult(TimeStampedModel):
     class Result(models.TextChoices):
         NOT  = "not", _("안함")
@@ -134,6 +128,3 @@ class RoutineDay(TimeStampedModel):
     
     class Meta:
         db_table = "routine_day"
-
-
-
