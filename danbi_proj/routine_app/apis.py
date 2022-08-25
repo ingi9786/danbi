@@ -42,7 +42,6 @@ class RoutineViewSet(viewsets.GenericViewSet):
         uid = self.request.user.id
         return Routine.objects.filter(account=uid)
 
-    @renderer_classes([JSONRenderer])
     def create(self, request):
         serializer = RoutineSerializer(data=request.data)
         if serializer.is_valid():
@@ -54,6 +53,8 @@ class RoutineViewSet(viewsets.GenericViewSet):
                     "data"   : serializer.data,
                     "message": msg
                 })
+            # return Response(serializer.data)
+    
     
     @renderer_classes([JSONRenderer])
     def retrieve(self, request, routine_id=None):

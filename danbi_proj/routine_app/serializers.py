@@ -13,7 +13,7 @@ class ResultSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RoutineResult
-        fields = ["result",] # "routine_result_id", "routine"    
+        fields = ["result","routine"] # "routine_result_id",
         # read_only_fields = ('routine', )
         
 
@@ -24,41 +24,32 @@ class DaySerializer(serializers.ModelSerializer):
     class Meta:
         model = RoutineDay 
         fields = ["id", "day", "routine", "result"]
-        read_only_fields = ("routine", )
+        # read_only_fields = ("routine", )
         
 # 이걸로 현재 조회가 가능한데, POST를 통한 create를 하기 싫으면 days, result에 required=False로 두자.
-# 
 class RoutineSerializer(serializers.ModelSerializer):
     days = DaySerializer(many=True) # readonly 해서 serializer까지 days가 못들어왔음 request.data까진 왔는데
-    # result = ResultSerializer(many=True) # day에서 result를 참조하게 함으로써 필요가 없어짐. 
-    # account = serializers.SerializerMethodField(name="_get_userid")
-
+    # result = ResultSerializer(many=True) # day에서 result를 참조하게 함으로써 필요가 없어짐.
+    # userid = serializers.SerializerMethodField(method_name="_get_userid", read_only=True)
+    
     class Meta:
         model = Routine
         fields = [
-            "routine_id", "title", "category",
-            "goal", "is_alarm", "days", 
-        ] # "result", "account"
+            "routine_id", "title", "category", "goal", "is_alarm", "days", "account"
+        ] # "result",
     
-    # https://stackoverflow.com/questions/22988878/pass-extra-arguments-to-serializer-class-in-django-rest-framework
-    # def _get_userid(self, obj):
-    #     user_id = self.context.get("user_id")
-    #     if user_id:
-    #         return obj.
-    #     return False
-    
-    # POST를 이용한 create까지 지원하려면 커스텀 create가 필요
     def create(self, validated_data):
-        # days, result는 routine모델의 필드가 아닌 prop이니까 validated data에서 뺴야한다.
-        # result = validated_data.pop("result")
         days = validated_data.pop("days")
+        # result = validated_data.pop("result")
+        account = validated_data.pop("account")
 
         db = get_user_model()
         test_user = db.objects.get(id=10)
-        # uid = validated_data.pop 작성 중 근데 이거 아닌듯
+
         routine = Routine.objects.create(**validated_data, account=test_user) 
-    
+
         for day in days:
+            RoutineResult.objects.create(result='not', routine=routine)
             RoutineDay.objects.create(**day, routine=routine) # day도 JSON(dict)로 입력했을테니까 + routine객체
         # for res in result:
         #     RoutineResult.objects.create(**res, routine=routine)
@@ -109,4 +100,15 @@ class RoutineSerializer(serializers.ModelSerializer):
     {"day": "월"},
     {"day": "수"}   
 ]
+'''
+
+'''
+{
+    "title": "posttest",
+    "category": "homework",
+    "goal": "sibal",
+    "is_alarm": false,
+    "days": ["wed", "thu", "sat"],
+    "account": 10
+}
 '''
