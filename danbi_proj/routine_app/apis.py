@@ -1,32 +1,6 @@
 from .models import Routine, RoutineDay, RoutineResult
 from .serializers import RoutineSerializer, DaySerializer
-from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-import json
-
-
-class RoutinetList(APIView):
-    """
-    List all routines, or create a new routine.
-    """
-    def post(self, request, format=None):
-        print(request.data)
-        # user_id = request.user.id
-        user_id = 10
-        serializer = RoutineSerializer(data=request.data) # context={"user_id":user_id}
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# get test >  http://127.0.0.1:8000/rou 
-    def get(self, request, format=None):
-        r = Routine.objects.filter(routine_id=1)
-        serializer = RoutineSerializer(r, many=True)
-        return Response(serializer.data)
-    
-
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import renderer_classes, action
