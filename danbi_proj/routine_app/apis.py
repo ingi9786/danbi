@@ -3,6 +3,7 @@ from .serializers import RoutineSerializer, DaySerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+import json
 
 
 class RoutinetList(APIView):
@@ -42,20 +43,20 @@ class RoutineViewSet(viewsets.GenericViewSet):
         uid = self.request.user.id
         return Routine.objects.filter(account=uid)
 
-    @renderer_classes([JSONRenderer])
-    def create(self, request):
+    def create(self, request, routine_id=None):
+        # data = json.dumps(request.data)
         serializer = RoutineSerializer(data=request.data)
+        print("++++++++++++++++++++++++++")
+        serializer.is_valid(raise_exception=True)
         if serializer.is_valid():
             serializer.save()
             msg = { "msg"    : "You have successfully created the routine.",
                     "status" : "ROUTINE_CREATE_OK_201" }
-            return Response(
-                {
-                    "data"   : serializer.data,
-                    "message": msg
-                })
+            # return Response({"data":serializer.data,"message": msg})
+            return Response(serializer.data)
     
-    @renderer_classes([JSONRenderer])
+    
+    # @renderer_classes([JSONRenderer])
     def retrieve(self, request, routine_id=None):
         query = self.get_queryset().filter(pk=routine_id).first()
 
@@ -84,13 +85,13 @@ class RoutineViewSet(viewsets.GenericViewSet):
                 "msg"    : "The routine has been modified.",
                 "status" : "ROUTINE_UPDATE_OK_200"
             }
-            # return Response({
-            #         "data":serializer.data,
-            #         "message": msg
-            #         })
-            return Response(serializer.data)
+            return Response({
+                    "data":serializer.data,
+                    "message": msg
+                    })
+            # return Response(serializer.data)
 
-    @renderer_classes([JSONRenderer])
+    # @renderer_classes([JSONRenderer])
     def destroy(self, request, routine_id=None):
         msg = { "msg"    : "The routine has been deleted.",
                 "status" : "ROUTINE_DELETE_OK_200"}
