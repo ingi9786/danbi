@@ -1,12 +1,15 @@
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from .models import Routine, RoutineDay
 from .serializers import RoutineSerializer, DaySerializer
 from .utils import *
 
 
+
 class RoutineViewSet(viewsets.GenericViewSet):
     serializer_class = RoutineSerializer
+    permission_classes = (IsAuthenticated,)
     lookup_field     = 'routine_id'
 
     def get_queryset(self):
