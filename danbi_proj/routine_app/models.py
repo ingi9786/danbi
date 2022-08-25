@@ -131,7 +131,6 @@ class RoutineDay(TimeStampedModel):
     
     day        = models.CharField(max_length=3, choices=Day.choices)
     routine    = models.ForeignKey(Routine, on_delete=models.CASCADE)
-    result     = models.ForeignKey(RoutineResult, on_delete=models.CASCADE)
     
     class Meta:
         db_table = "routine_day"
